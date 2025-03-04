@@ -1,0 +1,3 @@
+[submodule "ui"]
+	path = ui
+	url = https://github.com/jangam-sridhar-reddy/e-commerce-ui.git

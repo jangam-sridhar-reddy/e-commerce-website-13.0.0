@@ -1,0 +1,13 @@
+# UI
+# Angular
+node_modules/
+dist/
+coverage/
+.angular/
+*.log
+*.tmp
+src/environments/environment.ts
+src/environments/environment.prod.ts
+
+# common
+.early.coverage

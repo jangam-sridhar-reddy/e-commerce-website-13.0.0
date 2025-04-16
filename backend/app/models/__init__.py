@@ -1,2 +1,3 @@
 from .mainCategoriesModels import MainCategoryModel
 from .subCategoriesModels import SubCategoriesModel
+from .productModels import ProductModel

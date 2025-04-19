@@ -2,8 +2,10 @@ from typing import List
 from fastapi import File, Form, HTTPException, UploadFile
 from app.schemas.productSchema import CreateProductSchema
 from app.models.productModels import ProductModel
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.services.productImageServices import upload_image_to_cloudinary
+from app.models.subCategoriesModels import SubCategoriesModel
+from app.models.mainCategoriesModels import MainCategoryModel
 
 def checkProductName(pName:str):
     product =  ProductModel.query.filter(ProductModel.productName == pName).first()
@@ -18,8 +20,39 @@ def getProductByID(ID:int) -> ProductModel:
    return product
 
 
-def getAllProducts(skip:int, limit:int)-> List[ProductModel]:
-    return ProductModel.query.order_by(ProductModel.ID).offset(skip).limit(limit).all()
+def getAllProducts(skip:int, limit:int, db: Session)-> List[dict]:
+
+    products: List[ProductModel] =(
+        db.query(ProductModel)
+        .options(
+            joinedload(ProductModel.category),
+            joinedload(ProductModel.subCategory),
+            joinedload(ProductModel.stock)
+        )
+        .order_by(ProductModel.ID)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+    
+    productResults: List = []
+
+    for product in products:
+        productResults.append({
+            "ID" : product.ID,
+            "productName": product.productName,
+            "product_price": product.product_price,
+            "imageURL": product.imageURL,
+            "created_at": product.created_at,
+            "updated_at": product.updated_at,
+            "category_id": product.category_id,
+            "sub_category_id": product.sub_category_id,
+            "stock_id": product.stock_id,
+            "category_name": product.category.cName if product.category else None,
+            "subCategory_name": product.subCategory.subCname if product.subCategory else None,
+            "stockStatus": product.stock.statusName if product.stock else None
+        })
+    return productResults
 
 
 async def updateProduct(

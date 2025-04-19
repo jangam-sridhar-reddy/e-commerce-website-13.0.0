@@ -25,3 +25,9 @@ def user_login(login: UserLoginSchema, db:Session = Depends(get_db)) -> dict[str
 def get_user(current_user: UserSchema = Depends(getCurrentUser())) -> UserModel:
     db_user: UserModel = current_user
     return db_user
+
+@router.get('/admin-user', response_model = UserSchema)
+def get_user(current_user: UserSchema = Depends(getCurrentUser(admin_only=True))) -> UserModel:
+    db_user: UserModel = current_user
+    return db_user
+

@@ -2,7 +2,7 @@
 from typing import List
 from fastapi import APIRouter, Depends, File,  Form, UploadFile
 from sqlalchemy.orm import Session
-from app.schemas.productSchema import ProductSchema, CreateProductSchema 
+from app.schemas.productSchema import ProductSchema, CreateProductSchema, ProductSchemaOut 
 from app.models.productModels import ProductModel
 from app.database.database import get_db
 from app.services.productServices import createProduct, getProductByID, getAllProducts, updateProduct, deleteProduct
@@ -38,9 +38,9 @@ async def create_Product(
 def get_product_by_id(ID:int, currentUser:UserModel = Depends(getCurrentUser()),) -> ProductModel:
     return getProductByID(ID=ID)
     
-@router.get('/get-products', response_model=List[ProductSchema])
-def get_products(skip:int = 0, limit:int = 10, currentUser:UserModel = Depends(getCurrentUser()),) -> List[ProductModel]:
-    return getAllProducts(skip=skip, limit=limit)
+@router.get('/get-products', response_model=List[ProductSchemaOut])
+def get_products(skip:int = 0, limit:int = 10, currentUser:UserModel = Depends(getCurrentUser()), db: Session = Depends(get_db)) -> List[ProductModel]:
+    return getAllProducts(skip=skip, limit=limit, db = db)
 
 @router.put('/update/{ID}', response_model=CreateProductSchema)
 async def update_product(
